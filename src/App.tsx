@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 
 type Ticket = { id: number; title: string; status: string; priority: string };
 
+const banners: Record<string, { label: string; bg: string; fg: string }> = {
+  local: { label: "LOCAL", bg: "#1e66f5", fg: "#fff" },
+  preview: { label: "PREVIEW — not live", bg: "#f9d71c", fg: "#000" },
+  production: { label: "PRODUCTION", bg: "#2e9e4f", fg: "#fff" },
+};
+
 export default function App() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [env, setEnv] = useState("");
@@ -27,9 +33,28 @@ export default function App() {
       .finally(() => setLoading(false));
   }, [status, priority]);
 
+  const banner = banners[env] ?? { label: env, bg: "#888", fg: "#fff" };
+
   return (
+    <>
+      {env && (
+        <div
+          style={{
+            width: "100%",
+            padding: 8,
+            boxSizing: "border-box",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontFamily: "sans-serif",
+            background: banner.bg,
+            color: banner.fg,
+          }}
+        >
+          {banner.label}
+        </div>
+      )}
     <main style={{ fontFamily: "sans-serif", maxWidth: 600, margin: "40px auto" }}>
-      <h1>Ticket Desk</h1>
+      <h1>Ticket Desk{!loading && !error && ` (${tickets.length})`}</h1>
       <p>Environment: <b>{env}</b></p>
 
       <select value={status} onChange={e => setStatus(e.target.value)}>
@@ -56,5 +81,6 @@ export default function App() {
         </ul>
       )}
     </main>
+    </>
   );
 }
