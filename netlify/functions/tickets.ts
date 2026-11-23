@@ -7,8 +7,12 @@ const tickets = [
 ];
 
 export default async (req: Request) => {
-  const status = new URL(req.url).searchParams.get("status");
-  const result = status ? tickets.filter(t => t.status === status) : tickets;
+  const params = new URL(req.url).searchParams;
+  const status = params.get("status");
+  const priority = params.get("priority");
+  const result = tickets.filter(
+    t => (!status || t.status === status) && (!priority || t.priority === priority)
+  );
 
   return Response.json({
     env: process.env.APP_ENV ?? "not set",
